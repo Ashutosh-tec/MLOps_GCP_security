@@ -1,0 +1,93 @@
+git init
+# Initialize a new Git repository
+
+git clone https://github.com/iterative/example-versioning
+# Clone the example project for model versioning
+
+cd example-versioning
+# Navigate to the project directory
+
+python3 -m venv .env
+# Create a Python virtual environment
+
+source .env/bin/activate
+# Activate the virtual environment
+
+pip install -r requirements.txt
+# Install the project dependencies
+
+pip install dvc
+# Install DVC for data and model versioning
+
+dvc get https://github.com/iterative/dataset-registry tutorials/versioning/data.zip
+# Download dataset ZIP from DVC's dataset registry without cloning
+
+unzip -q data.zip
+# Unzip the dataset
+
+rm -f data.zip
+# Remove the zip file after extraction
+
+dvc add data
+# Track the unzipped `data` directory using DVC  
+
+python train.py
+# Train the model using current data
+
+dvc add model.weights.h5
+# Track the trained model file with DVC
+
+git add data.dvc model.weights.h5.dvc metrics.csv .gitignore
+# Stage DVC metadata files, metrics, and gitignore for commit
+
+git commit -m "first iteration done with 1000 images"
+# Commit the first model iteration to Git
+
+git tag -a "v1.0" -m "model v1.0, 1000 images"
+# Create a Git tag for version 1.0
+
+
+dvc get https://github.com/iterative/dataset-registry tutorials/versioning/new-labels.zip
+# Download updated data with new labels
+
+unzip -q new-labels.zip
+# Unzip the new dataset
+
+rm -f new-labels.zip
+# Remove the ZIP file
+
+dvc add data
+# Re-add the updated data directory to DVC
+
+python train.py
+# Retrain the model on the updated data
+
+dvc add model.weights.h5
+# Track the newly trained model with DVC
+
+git add data.dvc model.weights.h5.dvc metrics.csv .gitignore
+# Stage all changes for commit
+
+git commit -m "second iteration done with 2000 images"
+# Commit second model version with updated data
+
+git tag -a "v2.0" -m "model v2.0, 2000 images"
+# Create a Git tag for version 2.0
+
+git checkout v1.0
+# Switch back to Git tag version v1.0
+
+dvc checkout
+# Restore corresponding data and model files tracked by DVC
+
+git checkout v1.0 data.dvc
+# Explicitly restore the data.dvc file if needed
+
+dvc checkout data.dvc
+# Ensure the dataset matches the DVC metadata
+
+dvc list . iris.csv --rev v0.1
+# Shows the version of the model at Git tag v0.1
+
+dvc list . iris.csv --rev v0.2
+# Shows the version of the model at Git tag v0.2
