@@ -1,4 +1,4 @@
-name: Sanity Test for IRIS Pipeline
+me: Sanity Test for IRIS Pipeline
 # version 2
 
 on:
@@ -33,9 +33,6 @@ jobs:
           python -m pip install --upgrade pip
           pip install scikit-learn pandas numpy joblib
           npm install -g @dvcorg/cml
-
-      - name: Train model
-        run: python train.py
 
       - name: Run unit tests
         run: |
