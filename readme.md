@@ -1,55 +1,99 @@
-# IRIS Classification Pipeline with DVC
+RIS Classification Pipeline
 
-This project demonstrates how to build a simple machine learning pipeline for classifying iris species using a Decision Tree classifier. It integrates **DVC (Data Version Control)** to manage data and model versions efficiently.
+This project builds and tests a Decision Tree classifier on the IRIS dataset, with MLOps features including:
 
----
-
-## 🔍 Problem Statement
-
-Incorporate **DVC** to version control the local data and model artifacts within an existing ML pipeline for IRIS dataset classification.
-
----
-
+- Data poisoning simulation
+- GitHub Actions for CI/CD
+- Unit testing with `unittest`
+- CML reports on Pull Requests
 
 ---
 
+## 📁 Project Structure
 
-## Initialize DVC (if not already initialized)  
 ```
-dvc init
+.
+├── data/                     # Raw or poisoned IRIS data
+├── models/                  # Saved model files
+├── train.py                 # Model training script
+├── test.py                  # Unit tests for the trained model
+├── poison_data.py           # Function to simulate data poisoning
+├── metrics.txt              # Output metrics used by CML
+└── .github/
+    └── workflows/
+        └── sanity_check.yaml   # GitHub Actions CI workflow
 ```
 
-## Restore data from DVC
+---
+
+## ⚙️ Setup
+
+```bash
+python -m venv env
+source env/bin/activate
+pip install -r requirements.txt
 ```
-dvc checkout iris.csv.dvc
+
+---
+
+## 🚀 Training the Model
+
+```bash
+python train.py
 ```
 
+- Trains a Decision Tree on clean or poisoned IRIS data
+- Saves model as `decision_tree_model.joblib`
 
 ---
 
-## 📌 Key Learnings
+## ✅ Run Unit Tests
 
-1. **Data Versioning**  
-Used `dvc add` to track the `iris.csv` dataset and manage different versions across Git commits and tags.
+```bash
+python -m unittest test.py -v
+```
 
-2. **Model Reproducibility**  
-Trained and saved the `model.joblib` file, tracked with DVC to ensure model version consistency.
-
-3. **Tag-based Rollback**  
-Used Git tags (`v0.1`, `v0.2`) along with DVC to switch between original and tweaked versions of the dataset for easy experimentation.
+- Tests model predictions and input schema
 
 ---
 
-## 🏷️ Version History
+## 🧪 Data Poisoning
 
-- `v0.1`: Initial version with original dataset (151 rows).
-- `v0.2`: Updated dataset with tweaks (177 rows)
+Poison IRIS data using:
+
+```python
+from poison_data import poison_data
+data = poison_data(data, percent=0.1, noise_type='random')
+```
+
+- Simulates 5%, 10%, or 50% data poisoning attacks.
 
 ---
 
-## ✅ Result
+## 🔁 GitHub Actions CI
 
-The pipeline with DVC integration helps efficiently manage data/model files and supports reproducibility and collaboration in ML workflows.
+CI runs on:
+- Push to `main` or `dev`
+- Pull requests to `main`
+- Manual dispatch
+
+Workflow steps:
+```yaml
+- Checkout code
+- Install dependencies
+- Train model (train.py)
+- Run tests (test.py)
+- Create CML report (test_output.txt, metrics.txt)
+```
+
+Trigger manually if needed:
+```bash
+git commit --allow-empty -m "Trigger CI"
+git push origin main
+```
 
 ---
 
+## 📄 License
+
+MIT License
