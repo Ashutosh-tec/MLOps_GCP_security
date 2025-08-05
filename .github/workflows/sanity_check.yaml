@@ -1,4 +1,4 @@
-me: Sanity Test for IRIS Pipeline
+name: Sanity Test for IRIS Pipeline
 # version 2
 
 on:
