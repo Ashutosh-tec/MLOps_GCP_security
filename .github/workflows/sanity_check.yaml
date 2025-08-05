@@ -1,5 +1,6 @@
-name: Sanity Test for IRIS Pipeline
+me: Sanity Test for IRIS Pipeline
 # version 2
+
 on:
   push:
     branches:
@@ -17,6 +18,7 @@ permissions:
 jobs:
   test_model:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -29,13 +31,19 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install scikit-learn pandas numpy
+          pip install scikit-learn pandas numpy joblib
           npm install -g @dvcorg/cml
 
+      - name: Train model
+        run: python train.py
 
       - name: Run unit tests
         run: |
           python -m unittest test.py --verbose > test_output.txt 2>&1
+
+      - name: Show test output on failure
+        if: failure()
+        run: cat test_output.txt
 
       - name: Create CML report
         env:
@@ -44,5 +52,6 @@ jobs:
           echo "## Test Results" >> report.md
           cat test_output.txt >> report.md
           echo "## Model Metrics" >> report.md
-          cat metrics.txt >> report.md
+          cat metrics.txt >> report.md || echo "No metrics found." >> report.md
           cml comment create --publish --pr report.md
+
