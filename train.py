@@ -4,9 +4,14 @@ from sklearn.model_selection import train_test_split
 from sklearn.tree import DecisionTreeClassifier
 from sklearn import metrics
 import joblib
+from poison_data import poison_data
+
 
 # Load data
-data = pd.read_csv('iris.csv')
+data = poison_data(pd.read_csv('data/iris.csv'))
+data.to_csv("data/iris.csv", index=False)
+
+
 print("Data Loaded...")
 
 # Split data
